@@ -1,0 +1,25 @@
+# Bytecode
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+*.venv/
+env/
+
+# Database
+*.sqlite3
+*.db
+
+# Media and static files
+media/
+static/
+
+# Security
+.env
+secret.json
+
+# IDE specific
+.idea/
+.vscode/
+*.swp
