@@ -11,7 +11,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   void onMenuPressed() {
-    print("Button Pressed");
+   // print("Button Pressed");
   }
 
   final List<String> items =["one", "two", "three"];
@@ -82,7 +82,7 @@ class _HomePageState extends State<HomePage> {
               ),
               PopupMenuButton(
                 onSelected: (String result) {
-                  print(result);
+                  //print(result);
                 },
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
                   const PopupMenuItem<String>(
