@@ -20,9 +20,13 @@ jobs:
     - uses: subosito/flutter-action@v2.14.0
       with:
         flutter-version: '3.3.10'
-    - run: cd ${{ github.workspace }}/frontend
-    - run: pwd
+
     - run: ls -al
+      working-directory: /home/runner/work/Task/Task
+
     - run: flutter pub get
+      working-directory: /home/runner/work/Task/Task/frontend
     - run: flutter analyze
+      working-directory: /home/runner/work/Task/Task/frontend
     - run: flutter test
+      working-directory: /home/runner/work/Task/Task/frontend
