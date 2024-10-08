@@ -16,10 +16,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: subosito/flutter-action@v2
+    - uses: actions/checkout@v4.2.1
+    - uses: subosito/flutter-action@v2.14.0
       with:
-        flutter-version: '3.x'
+        flutter-version: 'default'
     - run: cd frontend
     - run: flutter pub get
     - run: flutter analyze
