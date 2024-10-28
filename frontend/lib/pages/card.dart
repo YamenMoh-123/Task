@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 class CardItem extends StatefulWidget {
+  final int id;
   final String title;
   final String rating;
   final String author;
-  const CardItem({super.key, required this.title, required this.rating, required this.author});
+  const CardItem({super.key, required this.id, required this.title, required this.rating, required this.author});
 
 
   @override

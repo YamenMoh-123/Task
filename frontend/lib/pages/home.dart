@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import '../models/item.dart';
 import '../styles/styles.dart';
 import 'card.dart';
@@ -17,8 +18,11 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    loadDataAsync();  // Correct the function call name
+    loadDataAsync();
   }
+
+
+
 
   Future<void> loadDataAsync() async {
     try {
@@ -28,22 +32,24 @@ class _HomePageState extends State<HomePage> {
       });
     } catch (e) {
       setState(() {
-        ListItems = [Item(title: 'Failed to load data', rating: 'N/A', author: 'N/A')];
+        ListItems =
+        [Item(id: 1, title: 'Failed to load data', rating: 'N/A', author: 'N/A')];
       });
     }
   }
 
   void onMenuPressed() async {
-   // print("Button Pressed");
+    // print("Button Pressed");
   }
 
-  final List<String> items =["one", "two", "three"];
+
+  final List<String> items = ["one", "two", "three"];
 
   var currentAmount = 6;
   String currentCategory = "Books";
 
 
-  AppBar buildAppBar(){
+  AppBar buildAppBar() {
     return AppBar(
       backgroundColor: Colors.white,
       flexibleSpace: SafeArea(
@@ -80,7 +86,8 @@ class _HomePageState extends State<HomePage> {
       margin: const EdgeInsets.all(10),
       child: Column(
 
-        mainAxisAlignment: MainAxisAlignment.start, // Adjust alignment as needed
+        mainAxisAlignment: MainAxisAlignment.start,
+        // Adjust alignment as needed
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -110,7 +117,8 @@ class _HomePageState extends State<HomePage> {
                 },
 
 
-                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                itemBuilder: (BuildContext context) =>
+                <PopupMenuEntry<String>>[
                   const PopupMenuItem<String>(
                     value: "Books",
                     child: Text("Books"),
@@ -154,22 +162,62 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildCards(){
+  Widget buildCards() {
     return Expanded(
-        child:(
-            ListView.builder(itemCount: ListItems.length,
-                itemBuilder: (context, index){
-                  return CardItem(key: ValueKey(ListItems[index]),
-                      title: ListItems[index].title,
-                      rating: ListItems[index].rating,
-                      author: ListItems[index].author
-                  );
-                })
-        )
+      child: RefreshIndicator(
+        onRefresh: loadDataAsync,
+        child: SlidableAutoCloseBehavior(
+        child: ListView.builder(
+          itemCount: ListItems.length,
+          itemBuilder: (context, index) {
+            return Slidable(
+              endActionPane: ActionPane(
+                motion: const DrawerMotion(),
+                children: [
+                  SlidableAction(
+                    onPressed: (BuildContext context) {
+                    },
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    icon: Icons.edit,
+                    label: 'Edit',
+                  ),
+                  SlidableAction(
+                    onPressed: (BuildContext context) {
+                      handleItemDelete(ListItems[index].id);
+                      setState(() {
+                        ListItems.removeAt(index);
+                      });
+                    },
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    icon: Icons.delete,
+                    label: 'Delete',
+                  ),
+                ],
+              ),
+              child: CardItem(
+                key: ValueKey(ListItems[index].id),
+                id: ListItems[index].id,
+                title: ListItems[index]. title,
+                rating: ListItems[index].rating,
+                author: ListItems[index].author,
+              ),
+            );
+          },
+        ),
+      ),
+    ),
     );
   }
 
-  BottomAppBar buildBottomAppBar(){
+
+  void handleItemDelete(int index) {
+    // print(index);
+     // api call to delete
+  }
+
+  BottomAppBar buildBottomAppBar() {
     return BottomAppBar(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,

@@ -84,6 +84,7 @@ env = environ.Env()
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 environ.Env.read_env(os.path.join(base_dir, '.env'))
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
