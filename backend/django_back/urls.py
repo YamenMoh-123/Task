@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from .views import ItemList
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('items/', ItemList.as_view(), name='item-list'),
 ]
