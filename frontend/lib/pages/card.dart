@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
 class CardItem extends StatefulWidget {
-  const CardItem({super.key});
+  final int id;
+  final String title;
+  final String rating;
+  final String author;
+  const CardItem({super.key, required this.id, required this.title, required this.rating, required this.author});
+
 
   @override
   State<CardItem> createState() => _CardItemState();
@@ -14,9 +19,9 @@ class _CardItemState extends State<CardItem> {
     return Card(
       child: ListTile(
         leading: Image.asset("assets/images/test.png"),
-        title: const Text('The Enchanted Nightingale'),
-        subtitle: const Text('Music by Julie Gable. Lyrics by Sidney Stein.'),
-        trailing: const Icon(Icons.more_vert),
+        title: Text(widget.title),
+        subtitle: Text(widget.author),
+        trailing: Text(widget.rating),
       ),
     );
   }
