@@ -1,8 +1,8 @@
 class Item {
   final int id;
-  final String title;
-  final String rating;
-  final String author;
+  String title;
+  String rating;
+  String author;
 
   Item({required this.id, required this.title, required this.rating, required this.author});
 

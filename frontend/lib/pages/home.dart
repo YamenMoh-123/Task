@@ -4,6 +4,7 @@ import '../models/item.dart';
 import '../styles/styles.dart';
 import 'card.dart';
 import '../services/api_fetch.dart';
+import '../services/api_crud.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,8 +21,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     loadDataAsync();
   }
-
-
 
 
   Future<void> loadDataAsync() async {
@@ -155,6 +154,21 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
+          Card(
+            child: ListTile(
+              title: const Center(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.add),
+                    ],
+                  )
+              ),
+              onTap: () {
+                handleItemAdd();
+              },
+            ),
+          ),
 
           buildCards(),
         ],
@@ -166,8 +180,10 @@ class _HomePageState extends State<HomePage> {
     return Expanded(
       child: RefreshIndicator(
         onRefresh: loadDataAsync,
-        child: SlidableAutoCloseBehavior(
-        child: ListView.builder(
+          child:
+            SlidableAutoCloseBehavior(
+
+          child: ListView.builder(
           itemCount: ListItems.length,
           itemBuilder: (context, index) {
             return Slidable(
@@ -176,6 +192,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   SlidableAction(
                     onPressed: (BuildContext context) {
+                      handleItemEdit(context, ListItems[index]);
                     },
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
@@ -184,7 +201,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   SlidableAction(
                     onPressed: (BuildContext context) {
-                      handleItemDelete(ListItems[index].id);
+                      ApiCrud().deleteItem(ListItems[index].id);
                       setState(() {
                         ListItems.removeAt(index);
                       });
@@ -206,15 +223,117 @@ class _HomePageState extends State<HomePage> {
             );
           },
         ),
+
       ),
     ),
     );
   }
 
 
-  void handleItemDelete(int index) {
-    // print(index);
-     // api call to delete
+
+
+  void handleItemAdd() {
+
+    Map<String, String> formData = {
+      'title': '',
+      'rating': '',
+      'author': '',
+    };
+    
+    showDialog(context: context,
+      builder: (BuildContext context){
+        return AlertDialog(
+          title: const Text("Add Item"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                decoration: const InputDecoration(labelText: "Title"),
+                onChanged: (value) => formData['title'] = value,
+              ),
+              TextField(
+                decoration: const InputDecoration(labelText: "Rating"),
+                onChanged: (value) => formData['rating'] = value,
+              ),
+              TextField(
+                decoration: const InputDecoration(labelText: "Author"),
+                onChanged: (value) => formData['author'] = value,
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("Save"),
+              onPressed: () async {
+                try {
+                  Item newItem = await ApiCrud().addItem(formData);
+                  setState(() {
+                    ListItems.add(newItem);
+                  });
+                  Navigator.of(context).pop();
+                } catch (e) {
+                  // Handle errors or show an error message
+                  print("Failed to add item: $e");
+                }
+              },
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  void handleItemEdit(BuildContext context, Item item) {
+    Map<String, String> formData = {
+      'title': item.title,
+      'rating': item.rating,
+      'author': item.author,
+    };
+
+    showDialog(context: context,
+      builder: (BuildContext context){
+        return AlertDialog(
+          title: const Text("Edit Item"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                decoration: const InputDecoration(labelText: "Title"),
+                onChanged: (value) => formData['title'] = value,
+                controller: TextEditingController(text: item.title),
+              ),
+              TextField(
+                decoration: const InputDecoration(labelText: "Rating"),
+                onChanged: (value) => formData['rating'] = value,
+                controller: TextEditingController(text: item.rating),
+              ),
+              TextField(
+                decoration: const InputDecoration(labelText: "Author"),
+                onChanged: (value) => formData['author'] = value,
+                controller: TextEditingController(text: item.author),
+              ),
+            ],
+          ),
+          actions: <Widget> [
+            TextButton(
+              child: const Text("Save"),
+              onPressed: (){
+                setState(() {
+                  item.title = formData['title']!;
+                  item.rating = formData['rating']!;
+                  item.author = formData['author']!;
+                });
+
+                ApiCrud().editItem(item);
+                Navigator.of(context).pop();
+              },
+            )
+          ]
+      );
+    },
+    );
+    // navigate to edit page
+
   }
 
   BottomAppBar buildBottomAppBar() {
