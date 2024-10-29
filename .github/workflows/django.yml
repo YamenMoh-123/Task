@@ -30,6 +30,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Check Python syntax
+      working-directory: /home/runner/work/Task/Task/backend
+      run: |
+        python -m compileall -f .
+
+
     - name: Run tests
       working-directory: /home/runner/work/Task/Task/backend
       run: |
