@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import '../models/item.dart';
 import '../styles/styles.dart';
-import 'card.dart';
+import '../widgets/card.dart';
 import '../services/api_fetch.dart';
 import '../services/api_crud.dart';
+import '../widgets/card_popup.dart';
+import '../widgets/appbars.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -37,47 +39,10 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void onMenuPressed() async {
-    // print("Button Pressed");
-  }
-
-
   final List<String> items = ["one", "two", "three"];
 
   var currentAmount = 6;
   String currentCategory = "Books";
-
-
-  AppBar buildAppBar() {
-    return AppBar(
-      backgroundColor: Colors.white,
-      flexibleSpace: SafeArea(
-          child: Container(
-            margin: const EdgeInsets.only(left: 10, right: 10),
-            decoration: BoxDecoration(
-              color: Colors.blue.shade50,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.menu),
-                  onPressed: onMenuPressed,
-                ),
-                const Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: "Search",
-                      border: InputBorder.none,
-                    ),
-                  ),
-                ),
-                IconButton(icon: const Icon(Icons.search), onPressed: () {})
-              ],
-            ),
-          )),
-    );
-  }
 
   Widget buildBody() {
     return Container(
@@ -165,7 +130,7 @@ class _HomePageState extends State<HomePage> {
                   )
               ),
               onTap: () {
-                handleItemAdd();
+                handleItemAdd(context);
               },
             ),
           ),
@@ -187,6 +152,7 @@ class _HomePageState extends State<HomePage> {
           itemCount: ListItems.length,
           itemBuilder: (context, index) {
             return Slidable(
+              key: ValueKey(ListItems[index].id),
               endActionPane: ActionPane(
                 motion: const DrawerMotion(),
                 children: [
@@ -229,152 +195,44 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-
-
-
-  void handleItemAdd() {
-
-    Map<String, String> formData = {
-      'title': '',
-      'rating': '',
-      'author': '',
-    };
-    
-    showDialog(context: context,
-      builder: (BuildContext context){
-        return AlertDialog(
-          title: const Text("Add Item"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                decoration: const InputDecoration(labelText: "Title"),
-                onChanged: (value) => formData['title'] = value,
-              ),
-              TextField(
-                decoration: const InputDecoration(labelText: "Rating"),
-                onChanged: (value) => formData['rating'] = value,
-              ),
-              TextField(
-                decoration: const InputDecoration(labelText: "Author"),
-                onChanged: (value) => formData['author'] = value,
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("Save"),
-              onPressed: () async {
-                try {
-                  Item newItem = await ApiCrud().addItem(formData);
-                  setState(() {
-                    ListItems.add(newItem);
-                  });
-                  Navigator.of(context).pop();
-                } catch (e) {
-                  // Handle errors or show an error message
-                  print("Failed to add item: $e");
-                }
-              },
-            )
-          ],
-        );
-      },
+  void handleItemAdd(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => cardDialog(
+        onItemSaved: (newItem) {
+          setState(() {
+            ListItems.add(newItem);
+          });
+        },
+      ),
     );
   }
 
   void handleItemEdit(BuildContext context, Item item) {
-    Map<String, String> formData = {
-      'title': item.title,
-      'rating': item.rating,
-      'author': item.author,
-    };
-
-    showDialog(context: context,
-      builder: (BuildContext context){
-        return AlertDialog(
-          title: const Text("Edit Item"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                decoration: const InputDecoration(labelText: "Title"),
-                onChanged: (value) => formData['title'] = value,
-                controller: TextEditingController(text: item.title),
-              ),
-              TextField(
-                decoration: const InputDecoration(labelText: "Rating"),
-                onChanged: (value) => formData['rating'] = value,
-                controller: TextEditingController(text: item.rating),
-              ),
-              TextField(
-                decoration: const InputDecoration(labelText: "Author"),
-                onChanged: (value) => formData['author'] = value,
-                controller: TextEditingController(text: item.author),
-              ),
-            ],
-          ),
-          actions: <Widget> [
-            TextButton(
-              child: const Text("Save"),
-              onPressed: (){
-                setState(() {
-                  item.title = formData['title']!;
-                  item.rating = formData['rating']!;
-                  item.author = formData['author']!;
-                });
-
-                ApiCrud().editItem(item);
-                Navigator.of(context).pop();
-              },
-            )
-          ]
-      );
-    },
-    );
-    // navigate to edit page
-
-  }
-
-  BottomAppBar buildBottomAppBar() {
-    return BottomAppBar(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.home),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.favorite),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.account_box),
-            onPressed: () {},
-          ),
-        ],
+    showDialog(
+      context: context,
+      builder: (context) => cardDialog(
+        item: item,
+        onItemSaved: (updatedItem) {
+          setState(() {
+            //
+          });
+          //
+        },
       ),
-
     );
   }
+
+
 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: buildAppBar(),
+      appBar: const appBarTop(),
       body: buildBody(),
-      bottomNavigationBar: buildBottomAppBar(),
+      bottomNavigationBar: const appBarBottom(),
     );
   }
 }

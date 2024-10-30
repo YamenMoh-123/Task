@@ -6,7 +6,7 @@ from .serializers import ItemSerializer
 
 class ItemListCreate(APIView):
     def get(self, request):
-        items = Item.objects.all()
+        items = Item.objects.all().order_by('id')
         serializer = ItemSerializer(items, many=True)
         return Response(serializer.data)
 
