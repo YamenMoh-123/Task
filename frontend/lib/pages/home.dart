@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import '../models/item.dart';
 import '../styles/styles.dart';
-import 'card.dart';
+import '../widgets/card.dart';
 import '../services/api_fetch.dart';
+import '../services/api_crud.dart';
+import '../widgets/card_popup.dart';
+import '../widgets/appbars.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,8 +25,6 @@ class _HomePageState extends State<HomePage> {
   }
 
 
-
-
   Future<void> loadDataAsync() async {
     try {
       List<Item> fetchedItems = await ApiFetch().fetchItems();
@@ -38,47 +39,10 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void onMenuPressed() async {
-    // print("Button Pressed");
-  }
-
-
   final List<String> items = ["one", "two", "three"];
 
   var currentAmount = 6;
   String currentCategory = "Books";
-
-
-  AppBar buildAppBar() {
-    return AppBar(
-      backgroundColor: Colors.white,
-      flexibleSpace: SafeArea(
-          child: Container(
-            margin: const EdgeInsets.only(left: 10, right: 10),
-            decoration: BoxDecoration(
-              color: Colors.blue.shade50,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.menu),
-                  onPressed: onMenuPressed,
-                ),
-                const Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: "Search",
-                      border: InputBorder.none,
-                    ),
-                  ),
-                ),
-                IconButton(icon: const Icon(Icons.search), onPressed: () {})
-              ],
-            ),
-          )),
-    );
-  }
 
   Widget buildBody() {
     return Container(
@@ -155,6 +119,21 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
+          Card(
+            child: ListTile(
+              title: const Center(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.add),
+                    ],
+                  )
+              ),
+              onTap: () {
+                handleItemAdd(context);
+              },
+            ),
+          ),
 
           buildCards(),
         ],
@@ -166,16 +145,20 @@ class _HomePageState extends State<HomePage> {
     return Expanded(
       child: RefreshIndicator(
         onRefresh: loadDataAsync,
-        child: SlidableAutoCloseBehavior(
-        child: ListView.builder(
+          child:
+            SlidableAutoCloseBehavior(
+
+          child: ListView.builder(
           itemCount: ListItems.length,
           itemBuilder: (context, index) {
             return Slidable(
+              key: ValueKey(ListItems[index].id),
               endActionPane: ActionPane(
                 motion: const DrawerMotion(),
                 children: [
                   SlidableAction(
                     onPressed: (BuildContext context) {
+                      handleItemEdit(context, ListItems[index]);
                     },
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
@@ -184,7 +167,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   SlidableAction(
                     onPressed: (BuildContext context) {
-                      handleItemDelete(ListItems[index].id);
+                      ApiCrud().deleteItem(ListItems[index].id);
                       setState(() {
                         ListItems.removeAt(index);
                       });
@@ -206,56 +189,50 @@ class _HomePageState extends State<HomePage> {
             );
           },
         ),
+
       ),
     ),
     );
   }
 
-
-  void handleItemDelete(int index) {
-    // print(index);
-     // api call to delete
-  }
-
-  BottomAppBar buildBottomAppBar() {
-    return BottomAppBar(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.home),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.favorite),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.account_box),
-            onPressed: () {},
-          ),
-        ],
+  void handleItemAdd(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => cardDialog(
+        onItemSaved: (newItem) {
+          setState(() {
+            ListItems.add(newItem);
+          });
+        },
       ),
-
     );
   }
+
+  void handleItemEdit(BuildContext context, Item item) {
+    showDialog(
+      context: context,
+      builder: (context) => cardDialog(
+        item: item,
+        onItemSaved: (updatedItem) {
+          setState(() {
+            //
+          });
+          //
+        },
+      ),
+    );
+  }
+
+
 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: buildAppBar(),
+      appBar: const appBarTop(),
       body: buildBody(),
-      bottomNavigationBar: buildBottomAppBar(),
+      bottomNavigationBar: const appBarBottom(),
     );
   }
 }
