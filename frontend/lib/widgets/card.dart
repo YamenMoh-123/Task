@@ -18,7 +18,7 @@ class CardItem extends StatefulWidget {
 class _CardItemState extends State<CardItem> {
 
   void handleCardTap(BuildContext context) {
-    print('Card tapped: ${widget.id}');
+    //print('Card tapped: ${widget.id}');
 
     Item curItem = Item(
       id: widget.id,
