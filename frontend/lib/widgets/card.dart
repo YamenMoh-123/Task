@@ -6,9 +6,10 @@ class CardItem extends StatefulWidget {
   final int id;
   final String title;
   final String rating;
-  final String author;
+  final String itemType;
+  final Map<String, dynamic> details;
 
-  const CardItem({super.key, required this.id, required this.title, required this.rating, required this.author});
+  const CardItem({super.key, required this.id, required this.title, required this.rating, required this.itemType, required this.details});
 
 
   @override
@@ -24,11 +25,12 @@ class _CardItemState extends State<CardItem> {
       id: widget.id,
       title: widget.title,
       rating: widget.rating,
-      author: widget.author,
+      itemType: widget.itemType,
+      details: widget.details
     );
     
     Navigator.of(context).push(
-     MaterialPageRoute(builder: (context)=> expandedItem(item: curItem))
+     MaterialPageRoute(builder: (context)=> ExpandedItem(item: curItem))
     );
   }
 
@@ -42,7 +44,7 @@ class _CardItemState extends State<CardItem> {
           child: ListTile(
             leading: Image.asset("assets/images/test.png"),
             title: Text(widget.title),
-            subtitle: Text(widget.author),
+            subtitle: Text(widget.itemType),
             trailing: Text(widget.rating),
       ),
     )

@@ -2,16 +2,20 @@ class Item {
   final int id;
   String title;
   String rating;
-  String author;
+  String itemType;
+  Map<String, dynamic> details;
 
-  Item({required this.id, required this.title, required this.rating, required this.author});
+
+  Item({required this.id, required this.title, required this.rating,
+    required this.itemType, required this.details});
 
   factory Item.fromJson(Map<String, dynamic> json) {
     return Item(
       id: json['id'],
       title: json['title'],
-      rating: json['rating'],
-      author: json['author'],
+      rating: json['rating'].toString(),
+      itemType: json['type'] ?? 'unknown',
+      details: json['additional_details'] ?? {},
     );
   }
 
@@ -20,7 +24,8 @@ class Item {
       'id': id,
       'title': title,
       'rating': rating,
-      'author': author,
+      'type': itemType,
+      'additional_details': details
     };
   }
 }

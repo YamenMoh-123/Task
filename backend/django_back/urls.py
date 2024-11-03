@@ -16,10 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from .views import ItemListCreate, ItemDetail
+from .views import ItemListCreate, ItemDetail, UserItemCreate
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('items/', ItemListCreate.as_view(), name='item-list-create'),
     path('items/<int:id>/', ItemDetail.as_view(), name='item-detail'),
+    path('items/createLink/', UserItemCreate.as_view(), name='create-user-item'),
 ]

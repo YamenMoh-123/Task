@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import '../models/item.dart';
 
-class expandedItem extends StatefulWidget {
+class ExpandedItem extends StatefulWidget {
 
   final Item item;
-  const expandedItem({super.key, required this.item});
+  const ExpandedItem({super.key, required this.item});
 
   @override
-  State<expandedItem> createState() => _expandedItemState();
+  State<ExpandedItem> createState() => _ExpandedItemState();
 }
 
-class _expandedItemState extends State<expandedItem> {
+class _ExpandedItemState extends State<ExpandedItem> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.item.title as String),
+        title: Text(widget.item.title),
       ),
       body: const Center(
         child: Text('Expanded Item'),

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
-class appBarTop extends StatefulWidget implements PreferredSizeWidget {
-  const appBarTop({super.key});
+class AppBarTop extends StatefulWidget implements PreferredSizeWidget {
+  const AppBarTop({super.key});
 
   @override
-  State<appBarTop> createState() => _appBarTopState();
+  State<AppBarTop> createState() => _AppBarTopState();
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
-class _appBarTopState extends State<appBarTop> {
+class _AppBarTopState extends State<AppBarTop> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -58,14 +58,14 @@ class _appBarTopState extends State<appBarTop> {
 
 
 
-class appBarBottom extends StatefulWidget {
-  const appBarBottom({super.key});
+class AppBarBottom extends StatefulWidget {
+  const AppBarBottom({super.key});
 
   @override
-  State<appBarBottom> createState() => _appBarBottomState();
+  State<AppBarBottom> createState() => _AppBarBottomState();
 }
 
-class _appBarBottomState extends State<appBarBottom> {
+class _AppBarBottomState extends State<AppBarBottom> {
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(

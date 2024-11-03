@@ -2,11 +2,22 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Item
-from .serializers import ItemSerializer
+from .serializers import ItemSerializer, UserItemSerializer
+
 
 class ItemListCreate(APIView):
     def get(self, request):
+        user_id = request.query_params.get('id')
+        item_type = request.query_params.get('type')
+
+        if not user_id or not item_type:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
         items = Item.objects.all().order_by('id')
+
+        items = items.filter(useritem__user_id=user_id)
+        items = items.filter(type=item_type)
+
         serializer = ItemSerializer(items, many=True)
         return Response(serializer.data)
 
@@ -49,3 +60,17 @@ class ItemDetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class UserItemCreate(APIView):
+    def post(self, request):
+        user_item_data = {
+            'user': request.data.get('user_id'),
+            'item': request.data.get('item_id'),
+            'progress': request.data.get('progress', ''),
+            'optional_details': request.data.get('optional_details', {})
+        }
+
+        user_item_serializer = UserItemSerializer(data=user_item_data)
+        if user_item_serializer.is_valid():
+            user_item_serializer.save()
+            return Response(user_item_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(user_item_serializer.errors, status=status.HTTP_400_BAD_REQUEST)

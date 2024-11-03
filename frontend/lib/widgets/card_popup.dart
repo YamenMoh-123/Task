@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import '../models/item.dart';
 import '../services/api_crud.dart';
 
-class cardDialog extends StatefulWidget {
+class CardDialog extends StatefulWidget {
 
   final Item? item;
   final Function(Item) onItemSaved;
-  const cardDialog({Key? key, this.item, required this.onItemSaved}) : super(key: key);
+  const CardDialog({super.key, this.item, required this.onItemSaved});
 
   @override
-  State<cardDialog> createState() => _cardDialogState();
+  State<CardDialog> createState() => _CardDialogState();
 }
 
-class _cardDialogState extends State<cardDialog> {
+class _CardDialogState extends State<CardDialog> {
   late Map<String, String> formData;
 
   @override
@@ -22,13 +22,11 @@ class _cardDialogState extends State<cardDialog> {
       formData = {
         'title': widget.item!.title,
         'rating': widget.item!.rating,
-        'author': widget.item!.author,
       };
     } else {
       formData = {
         'title': '',
         'rating': '',
-        'author': '',
       };
     }
   }
@@ -61,19 +59,23 @@ class _cardDialogState extends State<cardDialog> {
         TextButton(
           child: const Text("Save"),
           onPressed: () async {
+            if (!mounted) return;
+
             if (widget.item == null) {
               try {
                 Item newItem = await ApiCrud().addItem(formData);
+                if (!mounted) return;
                 widget.onItemSaved(newItem);
                 Navigator.of(context).pop();
               } catch (e) {
+                //
               }
             } else {
               // Editing an existing item
               widget.item!.title = formData['title']!;
               widget.item!.rating = formData['rating']!;
-              widget.item!.author = formData['author']!;
               ApiCrud().editItem(widget.item!);
+              if (!mounted) return;
               widget.onItemSaved(widget.item!);
               Navigator.of(context).pop();
             }

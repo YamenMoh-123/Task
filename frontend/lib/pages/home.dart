@@ -16,7 +16,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Item> ListItems = [];
+  List<Item> listItems = [];
 
   @override
   void initState() {
@@ -25,16 +25,19 @@ class _HomePageState extends State<HomePage> {
   }
 
 
+
+
   Future<void> loadDataAsync() async {
+
     try {
-      List<Item> fetchedItems = await ApiFetch().fetchItems();
+      List<Item> fetchedItems = await ApiFetch().fetchItems(context);
       setState(() {
-        ListItems = fetchedItems;
+        listItems = fetchedItems;
       });
     } catch (e) {
       setState(() {
-        ListItems =
-        [Item(id: 1, title: 'Failed to load data', rating: 'N/A', author: 'N/A')];
+        listItems =
+        [Item(id: 1, title: 'Failed to load data', rating: 'N/A', itemType: "Unknown", details: {"hello":"m"})];
       });
     }
   }
@@ -147,18 +150,17 @@ class _HomePageState extends State<HomePage> {
         onRefresh: loadDataAsync,
           child:
             SlidableAutoCloseBehavior(
-
           child: ListView.builder(
-          itemCount: ListItems.length,
+          itemCount: listItems.length,
           itemBuilder: (context, index) {
             return Slidable(
-              key: ValueKey(ListItems[index].id),
+              key: ValueKey(listItems[index].id),
               endActionPane: ActionPane(
                 motion: const DrawerMotion(),
                 children: [
                   SlidableAction(
                     onPressed: (BuildContext context) {
-                      handleItemEdit(context, ListItems[index]);
+                      handleItemEdit(context, listItems[index]);
                     },
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
@@ -167,9 +169,9 @@ class _HomePageState extends State<HomePage> {
                   ),
                   SlidableAction(
                     onPressed: (BuildContext context) {
-                      ApiCrud().deleteItem(ListItems[index].id);
+                      ApiCrud().deleteItem(listItems[index].id);
                       setState(() {
-                        ListItems.removeAt(index);
+                        listItems.removeAt(index);
                       });
                     },
                     backgroundColor: Colors.red,
@@ -180,11 +182,12 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               child: CardItem(
-                key: ValueKey(ListItems[index].id),
-                id: ListItems[index].id,
-                title: ListItems[index]. title,
-                rating: ListItems[index].rating,
-                author: ListItems[index].author,
+                key: ValueKey(listItems[index].id),
+                id: listItems[index].id,
+                title: listItems[index]. title,
+                rating: listItems[index].rating,
+                itemType: listItems[index].itemType,
+                details: const {},
               ),
             );
           },
@@ -198,10 +201,10 @@ class _HomePageState extends State<HomePage> {
   void handleItemAdd(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => cardDialog(
+      builder: (context) => CardDialog(
         onItemSaved: (newItem) {
           setState(() {
-            ListItems.add(newItem);
+            listItems.add(newItem);
           });
         },
       ),
@@ -211,7 +214,7 @@ class _HomePageState extends State<HomePage> {
   void handleItemEdit(BuildContext context, Item item) {
     showDialog(
       context: context,
-      builder: (context) => cardDialog(
+      builder: (context) => CardDialog(
         item: item,
         onItemSaved: (updatedItem) {
           setState(() {
@@ -228,11 +231,12 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: const appBarTop(),
+      appBar: const AppBarTop(),
       body: buildBody(),
-      bottomNavigationBar: const appBarBottom(),
+      bottomNavigationBar: const AppBarBottom(),
     );
   }
 }
