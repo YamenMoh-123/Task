@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:provider/provider.dart';
 import '../models/item.dart';
+import '../providers/user_provider.dart';
 import '../styles/styles.dart';
 import '../widgets/card.dart';
-import '../services/api_fetch.dart';
 import '../services/api_crud.dart';
 import '../widgets/card_popup.dart';
 import '../widgets/appbars.dart';
@@ -30,14 +31,23 @@ class _HomePageState extends State<HomePage> {
   Future<void> loadDataAsync() async {
 
     try {
-      List<Item> fetchedItems = await ApiFetch().fetchItems(context);
+      List<Item> fetchedItems = await ApiCrud().fetchItems(context);
       setState(() {
         listItems = fetchedItems;
       });
     } catch (e) {
       setState(() {
         listItems =
-        [Item(id: 1, title: 'Failed to load data', rating: 'N/A', itemType: "Unknown", details: {"hello":"m"})];
+            [Item(
+        id: 1,
+        title: "First Item",
+        itemType: "unknown",
+        details: {},
+        rating: 5.0,
+        progress: "50%",
+                favourite: false,
+        optionalDetails: {'color': 'blue', 'size': 'medium'}
+        )];
       });
     }
   }
@@ -47,7 +57,8 @@ class _HomePageState extends State<HomePage> {
   var currentAmount = 6;
   String currentCategory = "Books";
 
-  Widget buildBody() {
+  Widget buildBody(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     return Container(
       padding: const EdgeInsets.all(3),
       margin: const EdgeInsets.all(10),
@@ -138,13 +149,14 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
-          buildCards(),
+          buildCards(int.parse(userProvider.user.userId)),
         ],
       ),
     );
   }
 
-  Widget buildCards() {
+  Widget buildCards(int userId) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     return Expanded(
       child: RefreshIndicator(
         onRefresh: loadDataAsync,
@@ -169,7 +181,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   SlidableAction(
                     onPressed: (BuildContext context) {
-                      ApiCrud().deleteItem(listItems[index].id);
+                      ApiCrud().deleteItem(userId, listItems[index].id);
                       setState(() {
                         listItems.removeAt(index);
                       });
@@ -184,10 +196,13 @@ class _HomePageState extends State<HomePage> {
               child: CardItem(
                 key: ValueKey(listItems[index].id),
                 id: listItems[index].id,
-                title: listItems[index]. title,
-                rating: listItems[index].rating,
+                title: listItems[index].title,
                 itemType: listItems[index].itemType,
-                details: const {},
+                details: listItems[index].details,
+                rating: listItems[index].rating,
+                favourite: listItems[index].favourite,
+                progress: listItems[index].progress,
+                optionalDetails: listItems[index].optionalDetails,
               ),
             );
           },
@@ -204,7 +219,7 @@ class _HomePageState extends State<HomePage> {
       builder: (context) => CardDialog(
         onItemSaved: (newItem) {
           setState(() {
-            listItems.add(newItem);
+            listItems.insert(0, newItem);
           });
         },
       ),
@@ -235,7 +250,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const AppBarTop(),
-      body: buildBody(),
+      body: buildBody(context),
       bottomNavigationBar: const AppBarBottom(),
     );
   }

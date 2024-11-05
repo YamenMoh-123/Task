@@ -47,7 +47,6 @@ class User(AbstractBaseUser):
 class Item(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=255)
-    rating = models.FloatField(default=0.0)
     type = models.CharField(max_length=50, default='unknown')
     additional_details = JSONField(blank=True, default=dict)
 
@@ -55,16 +54,19 @@ class Item(models.Model):
         return f'{self.title} ({self.type})'
 
 class UserItem(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    rating = models.FloatField(default = 0.0)
     progress = models.TextField(default='')
+    favourite = models.BooleanField(default=False)
     optional_details = JSONField(blank=True, default=dict)
 
     class Meta:
         unique_together = ('user', 'item')
 
     def __str__(self):
-        return f"{self.user.username} - {self.item.title}"
+        return f"{self.user.id} - {self.item.title}"
 
 
 

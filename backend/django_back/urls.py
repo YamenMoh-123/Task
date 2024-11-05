@@ -22,5 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('items/', ItemListCreate.as_view(), name='item-list-create'),
     path('items/<int:id>/', ItemDetail.as_view(), name='item-detail'),
-    path('items/createLink/', UserItemCreate.as_view(), name='create-user-item'),
+    path('userLink/', UserItemCreate.as_view(), name='create-user-item'),
+    path('userLink/<int:user_id>/<int:item_id>/', UserItemCreate.as_view(), name='delete-user-item'),
 ]
